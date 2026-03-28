@@ -15,7 +15,6 @@ jobs:
           URL: ${{ github.event.pull_request.html_url }}
           REPO: ${{ github.repository }}
           DESCRIPTION: ${{ github.event.pull_request.body }}
-          SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
         run: |
           payload=$(jq -n \
@@ -33,8 +32,7 @@ jobs:
                      "🔗 *PR Link:*\n" + $url)
             }')
 
-          curl -s -X POST \
+          curl -X POST \
             -H "Content-type: application/json" \
-            -H "Authorization: Bearer $SLACK_BOT_TOKEN" \
-            --data "{\"channel\":\"C0AP0BLHK71\",\"text\":$(echo "$payload" | jq '.text | @json')}" \
-            https://slack.com/api/chat.postMessage
+            --data "$payload" \
+            ${{ secrets.SLACK_WEBHOOK }}
